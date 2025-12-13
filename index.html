@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+<metaname="viewport"content="width=dewidth, initialscale=1.0">
+  <title>অফার লোড হচ্ছে...</title>
+  <style>
+    :root {
+      --primary: #6366F1;
+      --secondary: #8B5CF6;
+      --accent: #EC4899;
+      --glass: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text: #F8FAFC;
+      --text-secondary: #94A3B8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .glass-container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--glass);
+      border-radius: 24px;
+      padding: 40px 35px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 25px 45px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+    }
+
+    .floating-badge {
+      position: absolute;
+      top: -10px;
+      right: 30px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      display: inline-block;
+    }
+
+    .title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      border-radius: 2px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .loader-section {
+      margin: 35px 0;
+    }
+
+    .orbital-loader {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 25px;
+      position: relative;
+    }
+
+    .orbit {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid transparent;
+    }
+
+    .orbit-1 {
+      width: 100%;
+      height: 100%;
+      border-top: 2px solid var(--primary);
+      border-right: 2px solid transparent;
+      animation: orbitSpin 8s linear infinite;
+    }
+
+    .orbit-2 {
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+      border-bottom: 2px solid var(--secondary);
+      border-left: 2px solid transparent;
+      animation: orbitSpinReverse 6s linear infinite;
+    }
+
+    .orbit-3 {
+      width: 40%;
+      height: 40%;
+      top: 30%;
+      left: 30%;
+      border-top: 2px solid var(--accent);
+      border-right: 2px solid transparent;
+      animation: orbitSpin 4s linear infinite;
+    }
+
+    .central-orb {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%;
+      box-shadow: 
+        0 0 20px rgba(99, 102, 241, 0.5),
+        0 0 40px rgba(99, 102, 241, 0.3);
+    }
+
+    .status-display {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .countdown-timer {
+      font-size: 64px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 10px;
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: color 0.3s ease;
+    }
+
+    .status-text {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      min-height: 27px;
+    }
+
+    .progress-wrapper {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 25px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 3px;
+      transition: width 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 30px;
+      background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0), 
+        rgba(255, 255, 255, 0.6), 
+        rgba(255, 255, 255, 0));
+      animation: shimmer 1.5s infinite;
+    }
+
+    .action-panel {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+      transition: left 0.6s;
+    }
+
+    .action-btn:hover::before {
+      left: 100%;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .info-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 30px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .info-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .info-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* Animations */
+    @keyframes orbitSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes orbitSpinReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(400%); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .glass-container { padding: 30px 20px; }
+      .title { font-size: 26px; }
+      .countdown-timer { font-size: 48px; }
+      .orbital-loader { width: 150px; height: 150px; }
+      .action-panel { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <div class="floating-badge">এক্সক্লুসিভ অ্যাক্সেস</div>
+    
+    <div class="header">
+      <h1 class="title">প্রিমিয়াম অফার লোডিং</h1>
+      <p class="subtitle">
+        আপনার জন্য বিশেষভাবে নির্বাচিত এই অফারটি প্রস্তুত করা হচ্ছে। 
+        স্বয়ংক্রিয় রিডাইরেক্টের আগে আপনি এখনই অ্যাক্সেস করতে পারেন।
+      </p>
+    </div>
+    
+    <div class="loader-section">
+      <div class="orbital-loader">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="orbit orbit-3"></div>
+        <div class="central-orb"></div>
+      </div>
+      
+      <div class="status-display">
+        <div class="countdown-timer" id="countdown">08</div>
+        <div class="status-text" id="statusText">প্রস্তুত করা হচ্ছে...</div>
+      </div>
+      
+      <div class="progress-wrapper">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+    
+    <div class="action-panel">
+      <button class="action-btn primary-btn" id="accessBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M13 3L20 3L20 10"></path>
+          <path d="M20 3L11 12"></path>
+          <path d="M20 13V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V7C4 5.89543 4.89543 5 6 5H12"></path>
+        </svg>
+        এখনই অ্যাক্সেস করুন
+      </button>
+      
+      <button class="action-btn secondary-btn" id="waitBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        অপেক্ষা করুন
+      </button>
+    </div>
+    
+    <div class="info-box">
+      <div class="info-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        অফার সম্পর্কে তথ্য
+      </div>
+      <p class="info-text">
+        • এই অফারটি সীমিত সময়ের জন্য প্রযোজ্য<br>
+        • স্বয়ংক্রিয় রিডাইরেক্ট: <span id="timeLeft">8</span> সেকেন্ড<br>
+        • 100% নিরাপদ এবং সুরক্ষিত<br>
+        • কোন ব্যক্তিগত তথ্য প্রয়োজন নেই
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>© ২০২৩ প্রিমিয়াম অফারস | সর্বসত্ত্ব সংরক্ষিত</p>
+      <p style="margin-top: 5px; font-size: 11px; opacity: 0.7;">স্বয়ংক্রিয়ভাবে সেরা অফার নির্বাচন করা হয়েছে</p>
+    </div>
+  </div>
+
+  <script>
+    // 🔗 আপনার SINGLE Adsterra Direct লিংকটি এখানে বসান
+    const AD_LINK = "https://www.effectivegatecpm.com/j6t5rggimh?key=4c30a5663d9b1bb08c04c9c1070ddd67";
+    const AD_NAME = "প্রিমিয়াম ডিসকাউন্ট অফার";
+    
+    // DOM Elements
+    const countdownEl = document.getElementById('countdown');
+    const statusTextEl = document.getElementById('statusText');
+    const progressFillEl = document.getElementById('progressFill');
+    const timeLeftEl = document.getElementById('timeLeft');
+    const accessBtn = document.getElementById('accessBtn');
+    const waitBtn = document.getElementById('waitBtn');
+    
+    // Configuration
+    let timeLeft = 8; // seconds
+    let isRedirecting = false;
+    let countdownInterval;
+    
+    // Status messages
+    const statusMessages = [
+      "অফার লোড হচ্ছে...",
+      "ডিসকাউন্ট ভেরিফিকেশন চলছে",
+      "সেরা দাম নিশ্চিত করা হচ্ছে",
+      "প্রসেসিং সম্পন্ন হচ্ছে",
+      "প্রস্তুত! রিডাইরেক্টের জন্য প্রস্তুত"
+    ];
+    
+    let messageIndex = 0;
+    
+    // Redirect function
+    function redirectToOffer() {
+      if (isRedirecting) return;
+      
+      isRedirecting = true;
+      clearInterval(countdownInterval);
+      
+      // Update UI
+      countdownEl.textContent = "00";
+      statusTextEl.textContent = "রিডাইরেক্ট করা হচ্ছে...";
+      progressFillEl.style.width = "100%";
+      timeLeftEl.textContent = "0";
+      
+      // Add redirect animation
+      countdownEl.style.color = "#EC4899";
+      
+      // Redirect after 0.5 seconds
+      setTimeout(() => {
+        window.location.href = AD_LINK;
+      }, 500);
+    }
+    
+    // Start countdown
+    function startCountdown() {
+      countdownInterval = setInterval(() => {
+        timeLeft--;
+        
+        // Update countdown display
+        countdownEl.textContent = timeLeft.toString().padStart(2, '0');
+        timeLeftEl.textContent = timeLeft.toString();
+        
+        // Update progress bar
+        const progress = 100 - ((timeLeft / 8) * 100);
+        progressFillEl.style.width = `${progress}%`;
+        
+        // Update status message every 1.5 seconds
+        if ((8 - timeLeft) % 1.5 === 0) {
+          statusTextEl.textContent = statusMessages[messageIndex % statusMessages.length];
+          messageIndex++;
+        }
+        
+        // Change color for last 3 seconds
+        if (timeLeft <= 3) {
+          countdownEl.style.color = "#EC4899";
+        }
+        
+        // Redirect when time is up
+        if (timeLeft <= 0) {
+          redirectToOffer();
+        }
+      }, 1000);
+    }
+    
+    // Event listeners
+    accessBtn.addEventListener('click', () => {
+      if (confirm(`আপনি কি "${AD_NAME}" অফারে এখনই যেতে চান?`)) {
+        redirectToOffer();
+      }
+    });
+    
+    waitBtn.addEventListener('click', () => {
+      const waitMessages = [
+        `অফারটি ${timeLeft} সেকেন্ডের মধ্যে লোড হবে`,
+        "আপনার ধৈর্যের জন্য ধন্যবাদ!",
+        "সেরা অফারটি আপনার জন্য অপেক্ষা করছে",
+        "কিছুক্ষণ অপেক্ষা করুন, এটি মূল্যবান হবে"
+      ];
+      
+      const randomMsg = waitMessages[Math.floor(Math.random() * waitMessages.length)];
+      alert(randomMsg);
+    });
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add entrance animation
+      document.querySelector('.glass-container').style.animation = 'fadeIn 0.8s ease';
+      
+      // Start countdown
+      startCountdown();
+      
+      // Add mouse move effect
+      document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth) * 20 - 10;
+        const y = (e.clientY / window.innerHeight) * 20 - 10;
+        
+        document.querySelector('.glass-container').style.transform = 
+          `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+      });
+      
+      // Reset transform on mouse leave
+      document.addEventListener('mouseleave', () => {
+        document.querySelector('.glass-container').style.transform = 
+          'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+      });
+    });
+    
+    // Disable effects on mobile
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      document.querySelector('.glass-container').style.transform = 'none';
+    }
+  </script>
+</body>
+</html>
